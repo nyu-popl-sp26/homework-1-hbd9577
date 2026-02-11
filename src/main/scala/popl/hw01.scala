@@ -1,5 +1,7 @@
 package popl
 
+import scala.annotation.tailrec
+
 object hw01 extends App:
   /*
    * CSCI-UA.0480-055: Homework 1
@@ -81,26 +83,49 @@ object hw01 extends App:
   /* Exercises */
 
   def abs(n: Double): Double =
-    ???
+    if n<0 then n*(-1.0) else n
 
   def ar(p: Int): Int =
-    ???
+    var count = if p>=0 then 0 else 1
+    def ar_tail(p2:Int,c:Int): Int =
+      if p2 >= 10 then ar_tail(p2/10,c+1) else c+1
+    
+    ar_tail(abs(p.toDouble).toInt,count)
+
+
 
   def rep(s: String, t: String, n: Int): String =
     require (n >= 0)
-    ???
+    var concat= s+t
+
+    def rep_tail(s2: String, n2:Int): String =
+      if n2 <= 1 then s2 else rep_tail(concat + s2, n2 - 1)
+    
+    if n<= 0 then "" else rep_tail(s,n)
+
+    //if n <=0 then "" else rep(s+t,"",n-1) + s
 
 
   def approx(c: Double, xn: Double): Double =
-    ???
+    (2*xn + (c/(xn*xn)))/3
 
   def approxN(c: Double, xn: Double, n: Int): Double =
     require(n >= 0)
-    ???
+    
+    def approxN_tail(c2:Double, yn:Int): Double =
+      if yn<=0 then c2 else approxN_tail(approx(c,c2),yn-1)
+
+    approxN_tail(xn,n)
+
 
   def approxErr(c: Double, xn: Double, epsilon: Double): Double =
     require (epsilon > 0)
-    ???
+    @tailrec
+    def approxErr_tail(n: Double): Double =
+      val curr = abs(n - (c/(n*n)))
+      if curr < epsilon then n else approxErr_tail(approx(c,n))
+    
+    approxErr_tail(xn)
 
   def root(c: Double): Double =
     approxErr(c, 1.0, 0.0001)
